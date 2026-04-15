@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import { AuthGuard, AuthProvider } from "@/context/AuthContext";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -23,9 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={jakarta.variable}>
       <body className="bg-[#F5F3FF] font-sans text-gray-900 antialiased">
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <AuthGuard>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </AuthGuard>
+        </AuthProvider>
       </body>
     </html>
   );

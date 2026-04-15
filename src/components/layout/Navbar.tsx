@@ -1,16 +1,25 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, UserCircle2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { navLinks } from "@/data/home";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const router = useRouter();
 
   const openMenu = () => setIsOpen(true);
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = () => {
+    setIsOpen(false);
+    setIsProfileMenuOpen(false);
+  };
+  const toggleProfileMenu = () => setIsProfileMenuOpen((prev) => !prev);
 
   // Prevent background scrolling when menu is open
   useEffect(() => {
@@ -19,6 +28,12 @@ export default function Navbar() {
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
+
+  const handleLogout = () => {
+    logout();
+    closeMenu();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -53,20 +68,57 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop Buttons */}
+          {/* Desktop Auth */}
           <div className="hidden items-center gap-4 md:flex">
-            <Link
-              href="#"
-              className="text-sm font-medium text-gray-700 hover:text-indigo-600"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="#"
-              className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-            >
-              Join for Free
-            </Link>
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={toggleProfileMenu}
+                  className="flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-indigo-50"
+                  aria-haspopup="menu"
+                  aria-expanded={isProfileMenuOpen}
+                >
+                  <UserCircle2 className="h-5 w-5 text-indigo-600" />
+                  <span className="max-w-28 truncate">{user?.name || "Profile"}</span>
+                </button>
+
+                {isProfileMenuOpen ? (
+                  <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-gray-100 bg-white py-2 shadow-lg">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/login"
+                  className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                >
+                  Join for Free
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -136,21 +188,43 @@ export default function Navbar() {
 
           <hr className="my-2 border-indigo-100" />
 
-          <Link
-            href="#"
-            className="text-base font-medium text-gray-700 hover:text-indigo-600"
-            onClick={closeMenu}
-          >
-            Sign In
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                className="text-base font-medium text-gray-700 hover:text-indigo-600"
+                onClick={closeMenu}
+              >
+                Profile
+              </Link>
+              <button
+                type="button"
+                className="mt-2 flex items-center justify-center gap-2 rounded-full bg-red-50 px-4 py-2 text-center font-semibold text-red-600 transition hover:bg-red-100"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-base font-medium text-gray-700 hover:text-indigo-600"
+                onClick={closeMenu}
+              >
+                Sign In
+              </Link>
 
-          <Link
-            href="#"
-            className="mt-2 rounded-full bg-indigo-600 px-4 py-2 text-center font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-            onClick={closeMenu}
-          >
-            Join for Free
-          </Link>
+              <Link
+                href="/login"
+                className="mt-2 rounded-full bg-indigo-600 px-4 py-2 text-center font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                onClick={closeMenu}
+              >
+                Join for Free
+              </Link>
+            </>
+          )}
         </nav>
       </aside>
     </>
