@@ -80,7 +80,9 @@ export default function Navbar() {
                   aria-expanded={isProfileMenuOpen}
                 >
                   <UserCircle2 className="h-5 w-5 text-indigo-600" />
-                  <span className="max-w-28 truncate">{user?.name || "Profile"}</span>
+                  <span className="max-w-28 truncate">
+                    {user?.name?.trim() || "Profile"}
+                  </span>
                 </button>
 
                 {isProfileMenuOpen ? (

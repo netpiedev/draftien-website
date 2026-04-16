@@ -16,7 +16,7 @@ export type AuthUser = {
   email: string;
   name: string;
   mobileNumber: string | null;
-  role: "student" | "teacher";
+  role: "student" | "teacher" | null;
   isVerified: boolean;
 };
 
@@ -153,7 +153,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         email: authData.email,
         name: authData.name,
         mobileNumber: authData.mobileNumber,
-        role: authData.role,
+        role: authData.role ?? null,
         isVerified: authData.isVerified,
       };
 
@@ -222,36 +222,36 @@ export function AuthGuard({ children }: PropsWithChildren) {
   const router = useRouter();
   const { loading, isAuthenticated } = useAuth();
 
+  // Prevent redirects during the short window after OTP verification,
+  // when localStorage is updated before React state reflects it.
+  const storedAuth = getStoredAuth();
+  const effectiveIsAuthenticated =
+    isAuthenticated || Boolean(storedAuth?.token);
+
   useEffect(() => {
     if (loading) {
       return;
     }
 
-    if (!isAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
+    if (!effectiveIsAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
       router.replace("/login");
       return;
     }
 
-    if (
-      isAuthenticated &&
-      (pathname === "/login" || pathname === "/verify-otp")
-    ) {
+    if (effectiveIsAuthenticated && pathname === "/login") {
       router.replace("/");
     }
-  }, [isAuthenticated, loading, pathname, router]);
+  }, [effectiveIsAuthenticated, loading, pathname, router]);
 
   if (loading) {
     return null;
   }
 
-  if (!isAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
+  if (!effectiveIsAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
     return null;
   }
 
-  if (
-    isAuthenticated &&
-    (pathname === "/login" || pathname === "/verify-otp")
-  ) {
+  if (effectiveIsAuthenticated && pathname === "/login") {
     return null;
   }
 

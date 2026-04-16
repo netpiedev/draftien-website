@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/axios";
 
 const OTP_LENGTH = 6;
 const RESEND_TIME = 30;
@@ -26,7 +27,8 @@ export default function VerifyOtpPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const router = useRouter();
-  const { verifyOtp, resendOtp, pendingEmail, loading, isAuthenticated } = useAuth();
+  const { verifyOtp, resendOtp, pendingEmail, loading, isAuthenticated } =
+    useAuth();
 
   // Countdown timer
   useEffect(() => {
@@ -103,7 +105,26 @@ export default function VerifyOtpPage() {
     try {
       const otpValue = otp.join("");
       await verifyOtp(otpValue);
-      router.push("/");
+
+      // Decide next step based on backend state:
+      // - role null -> select-role
+      // - isOnboarded true -> home
+      // - otherwise -> onboarding for role
+      type MeResponse = {
+        data: { role: "student" | "teacher" | null; isOnboarded: boolean };
+      };
+      const meRes = await api.get("/users/me");
+      const me = (meRes.data as MeResponse).data;
+
+      if (!me?.role) {
+        router.push("/select-role");
+      } else if (me.isOnboarded) {
+        router.push("/");
+      } else {
+        router.push(
+          me.role === "student" ? "/onboarding/student" : "/onboarding/teacher",
+        );
+      }
     } catch (requestError: unknown) {
       const message =
         requestError &&

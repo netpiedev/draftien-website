@@ -1,7 +1,7 @@
 import { ArrowRight, Calendar, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { programs } from "@/data/home";
+import { courses as programs } from "@/data/courses";
 
 export default function Programs() {
   return (
@@ -19,7 +19,7 @@ export default function Programs() {
           </div>
 
           <Link
-            href="#"
+            href="/courses"
             className="inline-flex items-center gap-2 font-medium text-indigo-600 hover:text-indigo-700"
           >
             View all batches
@@ -30,9 +30,10 @@ export default function Programs() {
         {/* Program Cards */}
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {programs.map((program) => (
-            <div
+            <Link
               key={program.id}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-lg"
+              href={`/courses/${program.id}`}
+              className="block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-lg"
             >
               {/* Image Section */}
               <div className="relative h-52 w-full">
@@ -84,12 +85,12 @@ export default function Programs() {
                     </p>
                   </div>
 
-                  <button className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
+                  <div className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
                     Enroll Now
-                  </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
