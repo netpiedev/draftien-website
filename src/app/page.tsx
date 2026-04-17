@@ -1,8 +1,8 @@
-import Advantage from "@/components/sections/Advantage";
-import CTA from "@/components/sections/CTA";
-import Faculty from "@/components/sections/Faculty";
-import Hero from "@/components/sections/Hero";
-import Programs from "@/components/sections/Programs";
+import Advantage from "@/components/home/Advantage";
+import CTA from "@/components/home/CTA";
+import Faculty from "@/components/home/Faculty";
+import Hero from "@/components/home/Hero";
+import Programs from "@/components/home/Programs";
 
 export default function Home() {
   return (

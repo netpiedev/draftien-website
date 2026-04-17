@@ -1,4 +1,4 @@
-import CourseCard from "@/components/CourseCard";
+import CourseCard from "@/components/courses/CourseCard";
 import { courses } from "@/data/courses";
 
 export default function CoursesPage() {
